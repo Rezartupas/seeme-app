@@ -1,9 +1,17 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { TaskProvider } from "@/lib/task-context";
 import { Sidebar, TopBar, BottomNav, FAB } from "./navigation";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/auth");
+
+  if (isAuthPage) {
+    return <main className="min-h-screen bg-background">{children}</main>;
+  }
+
   return (
     <TaskProvider>
       <TopBar />
