@@ -10,8 +10,30 @@ export async function POST(request: NextRequest) {
   return handleCron(request);
 }
 
+interface DueTaskItem {
+  id: string;
+  title: string;
+  description: string | null;
+  date: string;
+  start_time: string | null;
+  end_time: string | null;
+  is_important: boolean;
+  is_urgent: boolean;
+  reminder_at: string | null;
+  user_id: string;
+  profiles: {
+    telegram_chat_id: string | null;
+    email: string | null;
+  };
+  task_categories?: {
+    categories?: {
+      name: string;
+    };
+  }[];
+}
+
 async function handleCron(request: NextRequest) {
-  // Verify Bearer CRON_SECRET or vercel cron header
+  // Verify Bearer CRON_SECRET
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
@@ -23,8 +45,7 @@ async function handleCron(request: NextRequest) {
   const now = new Date().toISOString();
 
   try {
-    // 1. Fetch pending tasks whose reminder_at <= NOW and reminder_sent = false
-    const { data: dueTasks, error: taskError } = await adminSupabase
+    const { data: rawTasks, error: taskError } = await adminSupabase
       .from("tasks")
       .select(`
         id,
@@ -57,18 +78,18 @@ async function handleCron(request: NextRequest) {
       return NextResponse.json({ error: taskError.message }, { status: 500 });
     }
 
-    if (!dueTasks || dueTasks.length === 0) {
+    const dueTasks = (rawTasks || []) as unknown as DueTaskItem[];
+
+    if (dueTasks.length === 0) {
       return NextResponse.json({ message: "No reminders due", processed: 0 });
     }
 
     let sentCount = 0;
 
     for (const task of dueTasks) {
-      const profile = (task as any).profiles;
-      const chatId = profile?.telegram_chat_id;
+      const chatId = task.profiles?.telegram_chat_id;
 
       if (!chatId) {
-        // User hasn't linked telegram, mark reminder_sent to true so we don't re-query
         await adminSupabase
           .from("tasks")
           .update({ reminder_sent: true, updated_at: now })
@@ -87,8 +108,8 @@ async function handleCron(request: NextRequest) {
       }
 
       // Format categories
-      const catNames = (task as any).task_categories
-        ?.map((tc: any) => tc.categories?.name)
+      const catNames = task.task_categories
+        ?.map((tc) => tc.categories?.name)
         .filter(Boolean)
         .join(", ");
 

@@ -8,15 +8,16 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import { Task, Category } from "./types";
+import type { User } from "@supabase/supabase-js";
+import { Task, Category, Profile } from "./types";
 import { createClient } from "./supabase/client";
 
 interface TaskContextValue {
   tasks: Task[];
   categories: Category[];
-  profile: any | null;
+  profile: Profile | null;
   loading: boolean;
-  user: any | null;
+  user: User | null;
   addTask: (
     task: Omit<Task, "id" | "createdAt" | "updatedAt" | "reminderSent">
   ) => Promise<void>;
@@ -36,9 +37,9 @@ const TaskContext = createContext<TaskContextValue | null>(null);
 export function TaskProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [profile, setProfile] = useState<any | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const supabase = createClient();
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -64,7 +65,9 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         .select("*")
         .eq("id", currentUser.id)
         .single();
-      setProfile(profData);
+      if (profData) {
+        setProfile(profData as Profile);
+      }
 
       // Fetch Categories
       const { data: catData, error: catErr } = await supabase
@@ -74,7 +77,13 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
       if (catErr) throw catErr;
 
-      const mappedCats: Category[] = (catData || []).map((c: any) => ({
+      interface DbCategory {
+        id: string;
+        name: string;
+        color: string;
+      }
+
+      const mappedCats: Category[] = ((catData as DbCategory[]) || []).map((c) => ({
         id: c.id,
         name: c.name,
         color: c.color,
@@ -94,7 +103,24 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
       if (taskErr) throw taskErr;
 
-      const mappedTasks: Task[] = (taskData || []).map((t: any) => ({
+      interface DbTask {
+        id: string;
+        title: string;
+        description: string | null;
+        date: string;
+        start_time: string | null;
+        end_time: string | null;
+        is_important: boolean;
+        is_urgent: boolean;
+        status: string;
+        reminder_at: string | null;
+        reminder_sent: boolean;
+        task_categories?: { category_id: string }[];
+        created_at: string;
+        updated_at: string;
+      }
+
+      const mappedTasks: Task[] = ((taskData as DbTask[]) || []).map((t) => ({
         id: t.id,
         title: t.title,
         description: t.description || undefined,
@@ -106,7 +132,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         status: t.status as "pending" | "completed",
         reminderAt: t.reminder_at || undefined,
         reminderSent: Boolean(t.reminder_sent),
-        categoryIds: (t.task_categories || []).map((tc: any) => tc.category_id),
+        categoryIds: (t.task_categories || []).map((tc) => tc.category_id),
         createdAt: t.created_at,
         updatedAt: t.updated_at,
       }));
@@ -120,16 +146,27 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   useEffect(() => {
-    fetchUserData();
+    let mounted = true;
+
+    const initData = async () => {
+      if (mounted) {
+        await fetchUserData();
+      }
+    };
+
+    initData();
 
     // Subscribe to auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
-      fetchUserData();
+      if (mounted) {
+        initData();
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [fetchUserData, supabase]);

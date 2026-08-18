@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTaskContext } from "@/lib/task-context";
@@ -8,25 +8,9 @@ import { useTaskContext } from "@/lib/task-context";
 export default function SettingsPage() {
   const router = useRouter();
   const supabase = createClient();
-  const { user, categories } = useTaskContext();
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, profile, categories, refreshData } = useTaskContext();
   const [linkCode, setLinkCode] = useState("");
   const [generating, setGenerating] = useState(false);
-
-  useEffect(() => {
-    async function loadProfile() {
-      if (!user) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      setProfile(data);
-      setLoading(false);
-    }
-    loadProfile();
-  }, [user, supabase]);
 
   const handleGenerateCode = async () => {
     setGenerating(true);
@@ -51,7 +35,7 @@ export default function SettingsPage() {
       .from("profiles")
       .update({ telegram_chat_id: null })
       .eq("id", user.id);
-    setProfile((prev: any) => ({ ...prev, telegram_chat_id: null }));
+    await refreshData();
     setLinkCode("");
   };
 
