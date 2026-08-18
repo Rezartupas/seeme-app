@@ -7,6 +7,13 @@ import Link from "next/link";
 
 const DAYS = ["SEN", "SEL", "RAB", "KAM", "JUM", "SAB", "MIN"];
 
+function formatDateToYMD(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function getMonthGrid(year: number, month: number) {
   const firstDay = new Date(year, month, 1);
   let startDay = firstDay.getDay() - 1; // Monday = 0
@@ -44,7 +51,7 @@ export default function CalendarPage() {
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = formatDateToYMD(new Date());
 
   const monthName = currentDate
     .toLocaleDateString("id-ID", { month: "long", year: "numeric" })
@@ -61,16 +68,40 @@ export default function CalendarPage() {
     return map;
   }, [tasks]);
 
-  const prevMonth = () => {
-    const prev = new Date(year, month - 1, 1);
-    setCurrentDate(prev);
-    setSelectedDate(prev);
+  const prevPeriod = () => {
+    if (viewMode === "week") {
+      const prev = new Date(currentDate);
+      prev.setDate(currentDate.getDate() - 7);
+      setCurrentDate(prev);
+      setSelectedDate(prev);
+    } else if (viewMode === "day") {
+      const prev = new Date(currentDate);
+      prev.setDate(currentDate.getDate() - 1);
+      setCurrentDate(prev);
+      setSelectedDate(prev);
+    } else {
+      const prev = new Date(year, month - 1, 1);
+      setCurrentDate(prev);
+      setSelectedDate(prev);
+    }
   };
 
-  const nextMonth = () => {
-    const next = new Date(year, month + 1, 1);
-    setCurrentDate(next);
-    setSelectedDate(next);
+  const nextPeriod = () => {
+    if (viewMode === "week") {
+      const next = new Date(currentDate);
+      next.setDate(currentDate.getDate() + 7);
+      setCurrentDate(next);
+      setSelectedDate(next);
+    } else if (viewMode === "day") {
+      const next = new Date(currentDate);
+      next.setDate(currentDate.getDate() + 1);
+      setCurrentDate(next);
+      setSelectedDate(next);
+    } else {
+      const next = new Date(year, month + 1, 1);
+      setCurrentDate(next);
+      setSelectedDate(next);
+    }
   };
 
   const goToday = () => {
@@ -80,9 +111,7 @@ export default function CalendarPage() {
   };
 
   // Selected date string helper
-  const selectedDateStr = `${selectedDate.getFullYear()}-${String(
-    selectedDate.getMonth() + 1
-  ).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+  const selectedDateStr = formatDateToYMD(selectedDate);
 
   const selectedDateTasks = tasksByDate[selectedDateStr] || [];
 
@@ -116,7 +145,7 @@ export default function CalendarPage() {
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 pb-4 border-b-2 border-primary">
         <div className="flex items-center gap-4">
           <button
-            onClick={prevMonth}
+            onClick={prevPeriod}
             className="p-2 neo-border hover:bg-surface-container-high active-press"
           >
             <span className="material-symbols-outlined">chevron_left</span>
@@ -125,7 +154,7 @@ export default function CalendarPage() {
             {monthName}
           </h2>
           <button
-            onClick={nextMonth}
+            onClick={nextPeriod}
             className="p-2 neo-border hover:bg-surface-container-high active-press"
           >
             <span className="material-symbols-outlined">chevron_right</span>
@@ -339,7 +368,7 @@ export default function CalendarPage() {
           <div className="hidden md:block w-full neo-border bg-surface">
             <div className="grid grid-cols-7 border-b-2 border-primary bg-surface-container-high">
               {weekDates.map((d, i) => {
-                const ds = d.toISOString().split("T")[0];
+                const ds = formatDateToYMD(d);
                 const isToday = ds === todayStr;
                 return (
                   <div
@@ -360,7 +389,7 @@ export default function CalendarPage() {
             </div>
             <div className="grid grid-cols-7 bg-primary gap-[2px] p-[2px]">
               {weekDates.map((d, i) => {
-                const ds = d.toISOString().split("T")[0];
+                const ds = formatDateToYMD(d);
                 const dayTaskList = tasksByDate[ds] || [];
                 return (
                   <div
@@ -397,7 +426,7 @@ export default function CalendarPage() {
           <div className="md:hidden flex flex-col gap-4">
             <div className="grid grid-cols-7 gap-1 bg-surface p-1 neo-border">
               {weekDates.map((d, i) => {
-                const ds = d.toISOString().split("T")[0];
+                const ds = formatDateToYMD(d);
                 const isSelected = ds === selectedDateStr;
                 const isToday = ds === todayStr;
                 const dayTaskList = tasksByDate[ds] || [];
