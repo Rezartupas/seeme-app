@@ -39,11 +39,19 @@ export default function DashboardPage() {
     getUpcomingTasks,
     categories,
     profile,
+    user,
   } = useTaskContext();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [tzLabel, setTzLabel] = useState("");
+
+  const displayName =
+    profile?.name ||
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "Pengguna";
 
   useEffect(() => {
     // Detect browser timezone label (e.g. "WIB", "WITA", "SGT", "JST")
@@ -107,8 +115,8 @@ export default function DashboardPage() {
       {/* Top bar & Clock */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b-2 border-primary">
         <div>
-          <h2 className="text-[28px] md:text-[32px] leading-[34px] md:leading-[38px] font-bold text-primary">
-            Ringkasan
+          <h2 className="text-[28px] md:text-[32px] leading-[34px] md:leading-[38px] font-black text-primary uppercase tracking-tight">
+            Halo, {displayName}!
           </h2>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-[13px] md:text-[14px] font-bold uppercase text-on-surface-variant tracking-[0.05em]">

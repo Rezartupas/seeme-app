@@ -26,6 +26,7 @@ interface TaskContextValue {
   restoreTasks: (ids: string[]) => Promise<void>;
   deleteTasks: (ids: string[]) => Promise<void>;
   rescheduleTask: (id: string, newDate: string) => Promise<void>;
+  updateProfileName: (name: string) => Promise<void>;
   addCategory: (cat: Omit<Category, "id">) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   getTasksByDate: (date: string) => Task[];
@@ -327,6 +328,33 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     [supabase, fetchUserData]
   );
 
+  const updateProfileName = useCallback(
+    async (name: string) => {
+      if (!user) return;
+      setProfile((prev) => (prev ? { ...prev, name } : null));
+
+      try {
+        const { error: userError } = await supabase.auth.updateUser({
+          data: { full_name: name, name },
+        });
+        if (userError) console.warn("Supabase auth user metadata update:", userError);
+
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ name })
+          .eq("id", user.id);
+        if (profileError) {
+          console.warn("Profile table update warning:", profileError);
+        }
+
+        await fetchUserData();
+      } catch (err) {
+        console.error("Error updating profile name:", err);
+      }
+    },
+    [user, supabase, fetchUserData]
+  );
+
   const addCategory = useCallback(
     async (cat: Omit<Category, "id">) => {
       if (!user) return;
@@ -403,6 +431,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         restoreTasks,
         deleteTasks,
         rescheduleTask,
+        updateProfileName,
         addCategory,
         deleteCategory,
         getTasksByDate,

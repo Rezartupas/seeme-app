@@ -1,6 +1,7 @@
 export interface Profile {
   id: string;
   email: string | null;
+  name?: string | null;
   telegram_chat_id: string | null;
   telegram_link_code: string | null;
   telegram_link_code_expires_at: string | null;

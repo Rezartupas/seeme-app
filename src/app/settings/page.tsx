@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTaskContext } from "@/lib/task-context";
@@ -9,9 +9,35 @@ import { useTaskContext } from "@/lib/task-context";
 export default function SettingsPage() {
   const router = useRouter();
   const supabase = createClient();
-  const { user, profile, categories, deleteCategory, refreshData } = useTaskContext();
+  const { user, profile, categories, deleteCategory, updateProfileName, refreshData } = useTaskContext();
   const [linkCode, setLinkCode] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [savingName, setSavingName] = useState(false);
+
+  const displayName =
+    profile?.name ||
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "Pengguna";
+
+  useEffect(() => {
+    setNameInput(displayName);
+  }, [displayName]);
+
+  const handleSaveName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nameInput.trim()) return;
+    setSavingName(true);
+    try {
+      await updateProfileName(nameInput.trim());
+      setIsEditingName(false);
+    } finally {
+      setSavingName(false);
+    }
+  };
 
   const handleGenerateCode = async () => {
     setGenerating(true);
@@ -63,12 +89,55 @@ export default function SettingsPage() {
           Profil Akun
         </h3>
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-primary text-on-primary flex items-center justify-center neo-border-3 text-[24px] font-bold">
-            {user?.email ? user.email.slice(0, 2).toUpperCase() : "SM"}
+          <div className="w-16 h-16 bg-primary text-on-primary flex items-center justify-center neo-border-3 text-[24px] font-bold shrink-0">
+            {displayName.slice(0, 2).toUpperCase()}
           </div>
-          <div>
-            <p className="text-[18px] font-bold">{user?.email?.split("@")[0] || "Pengguna"}</p>
-            <p className="text-[14px] text-on-surface-variant">{user?.email || "Tidak ada email"}</p>
+          <div className="flex-1 min-w-0">
+            {isEditingName ? (
+              <form onSubmit={handleSaveName} className="flex flex-col sm:flex-row gap-2 mt-1">
+                <input
+                  type="text"
+                  required
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  className="neo-input p-2 text-[16px] bg-surface-container-low font-bold"
+                  placeholder="Masukkan nama..."
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={savingName}
+                    className="px-3 py-1.5 bg-secondary-container text-on-secondary-container font-bold uppercase text-[12px] neo-border active-press disabled:opacity-50"
+                  >
+                    {savingName ? "Menyimpan..." : "Simpan"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNameInput(displayName);
+                      setIsEditingName(false);
+                    }}
+                    className="px-3 py-1.5 bg-surface text-on-surface font-bold uppercase text-[12px] neo-border active-press"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-[20px] font-black text-primary">{displayName}</p>
+                <button
+                  onClick={() => setIsEditingName(true)}
+                  className="p-1 hover:bg-secondary-container rounded neo-border text-on-surface-variant transition-colors flex items-center justify-center"
+                  title="Ubah nama profil"
+                  aria-label="Ubah nama profil"
+                >
+                  <span className="material-symbols-outlined text-[16px]">edit</span>
+                </button>
+              </div>
+            )}
+            <p className="text-[14px] text-on-surface-variant mt-0.5">{user?.email || "Tidak ada email"}</p>
           </div>
         </div>
         <button
