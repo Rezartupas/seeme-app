@@ -321,16 +321,16 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Mobile Selected Date Task Details (Visible only on mobile/tablet) */}
-          <div className="md:hidden flex flex-col gap-3">
+          {/* Selected Date Task Details (Visible on both mobile & desktop) */}
+          <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between border-b-2 border-primary pb-2">
-              <h3 className="text-[16px] font-black uppercase text-primary flex items-center gap-2">
-                <span className="material-symbols-outlined text-[20px]">
+              <h3 className="text-[16px] md:text-[20px] font-black uppercase text-primary flex items-center gap-2">
+                <span className="material-symbols-outlined text-[20px] md:text-[24px]">
                   event_note
                 </span>
                 {selectedDateFormatted}
               </h3>
-              <span className="text-[12px] font-bold bg-secondary-container px-2 py-0.5 neo-border">
+              <span className="text-[12px] md:text-[14px] font-bold bg-secondary-container px-2.5 py-1 neo-border">
                 {selectedDateTasks.length} Tugas
               </span>
             </div>
@@ -369,12 +369,22 @@ export default function CalendarPage() {
             <div className="grid grid-cols-7 border-b-2 border-primary bg-surface-container-high">
               {weekDates.map((d, i) => {
                 const ds = formatDateToYMD(d);
+                const isSelected = ds === selectedDateStr;
                 const isToday = ds === todayStr;
+                const dayTaskList = tasksByDate[ds] || [];
                 return (
                   <div
                     key={i}
-                    className={`p-3 border-r-2 border-primary last:border-r-0 text-center ${
-                      isToday ? "bg-secondary-container" : ""
+                    onClick={() => {
+                      setSelectedDate(d);
+                      setCurrentDate(d);
+                    }}
+                    className={`p-3 border-r-2 border-primary last:border-r-0 text-center cursor-pointer transition-colors ${
+                      isSelected
+                        ? "bg-secondary-container"
+                        : isToday
+                        ? "bg-surface-container-high"
+                        : "hover:bg-surface-container-low"
                     }`}
                   >
                     <div className="text-[12px] leading-[14px] font-bold uppercase">
@@ -390,11 +400,20 @@ export default function CalendarPage() {
             <div className="grid grid-cols-7 bg-primary gap-[2px] p-[2px]">
               {weekDates.map((d, i) => {
                 const ds = formatDateToYMD(d);
+                const isSelected = ds === selectedDateStr;
                 const dayTaskList = tasksByDate[ds] || [];
                 return (
                   <div
                     key={i}
-                    className="bg-surface p-2 min-h-[200px] flex flex-col gap-2"
+                    onClick={() => {
+                      setSelectedDate(d);
+                      setCurrentDate(d);
+                    }}
+                    className={`p-2 min-h-[200px] flex flex-col gap-2 cursor-pointer transition-colors ${
+                      isSelected
+                        ? "bg-secondary-container/30 ring-2 ring-primary inset-0 z-10"
+                        : "bg-surface hover:bg-surface-container-lowest"
+                    }`}
                   >
                     {dayTaskList.map((t) => (
                       <div
@@ -420,6 +439,44 @@ export default function CalendarPage() {
                 );
               })}
             </div>
+          </div>
+
+          {/* Desktop Selected Day Task Details */}
+          <div className="hidden md:flex flex-col gap-3">
+            <div className="flex items-center justify-between border-b-2 border-primary pb-2">
+              <h3 className="text-[20px] font-black uppercase text-primary flex items-center gap-2">
+                <span className="material-symbols-outlined text-[24px]">
+                  view_week
+                </span>
+                {selectedDateFormatted}
+              </h3>
+              <span className="text-[14px] font-bold bg-secondary-container px-2.5 py-1 neo-border">
+                {selectedDateTasks.length} Tugas
+              </span>
+            </div>
+
+            {selectedDateTasks.length === 0 ? (
+              <div className="bg-surface-container-lowest p-6 neo-border text-center">
+                <p className="text-[14px] text-on-surface-variant font-medium">
+                  Tidak ada tugas pada hari ini.
+                </p>
+                <Link
+                  href="/task/new"
+                  className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 bg-secondary-container text-on-secondary-container text-[12px] font-bold uppercase neo-border active-press"
+                >
+                  <span className="material-symbols-outlined text-[16px]">
+                    add
+                  </span>
+                  Tambah Tugas
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2.5">
+                {selectedDateTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Mobile Week View (Tabs + Selected Day Tasks) */}
