@@ -44,7 +44,13 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const supabase = createClient();
 
-  const todayStr = new Date().toISOString().split("T")[0];
+  const getLocalDateStr = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const fetchUserData = useCallback(async () => {
     try {
@@ -334,21 +340,29 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   );
 
   const getOverdueTasks = useCallback(
-    () => tasks.filter((t) => t.date < todayStr && t.status === "pending"),
-    [tasks, todayStr]
+    () => {
+      const today = getLocalDateStr();
+      return tasks.filter((t) => t.date < today && t.status === "pending");
+    },
+    [tasks]
   );
 
   const getTodayTasks = useCallback(
-    () => tasks.filter((t) => t.date === todayStr),
-    [tasks, todayStr]
+    () => {
+      const today = getLocalDateStr();
+      return tasks.filter((t) => t.date === today);
+    },
+    [tasks]
   );
 
   const getUpcomingTasks = useCallback(
-    () =>
-      tasks
-        .filter((t) => t.date > todayStr && t.status === "pending")
-        .sort((a, b) => a.date.localeCompare(b.date)),
-    [tasks, todayStr]
+    () => {
+      const today = getLocalDateStr();
+      return tasks
+        .filter((t) => t.date > today && t.status === "pending")
+        .sort((a, b) => a.date.localeCompare(b.date));
+    },
+    [tasks]
   );
 
   return (
