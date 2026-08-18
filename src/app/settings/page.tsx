@@ -57,26 +57,6 @@ export default function SettingsPage() {
         </h2>
       </header>
 
-      {/* Pintasan Arsip */}
-      <section className="neo-border neo-shadow p-6 mb-6 bg-surface-container-lowest flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h3 className="text-[20px] leading-[24px] font-bold uppercase flex items-center gap-2">
-            <span className="material-symbols-outlined">archive</span>
-            Arsip Tugas
-          </h3>
-          <p className="text-[14px] text-on-surface-variant mt-1">
-            Lihat riwayat tugas-tugas yang telah Anda selesaikan.
-          </p>
-        </div>
-        <Link
-          href="/archive"
-          className="px-6 py-3 bg-secondary-container text-on-secondary-container neo-border text-[14px] uppercase font-bold tracking-[0.05em] active-press neo-shadow-sm flex items-center gap-2"
-        >
-          Buka Arsip
-          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-        </Link>
-      </section>
-
       {/* Profil */}
       <section className="neo-border neo-shadow p-6 mb-6 bg-surface-container-lowest">
         <h3 className="text-[20px] leading-[24px] font-bold uppercase mb-4 border-b-2 border-primary pb-2">
@@ -161,7 +141,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Kategori Tersimpan */}
-      <section className="neo-border neo-shadow p-6 bg-surface-container-lowest">
+      <section className="neo-border neo-shadow p-6 mb-6 bg-surface-container-lowest">
         <h3 className="text-[20px] leading-[24px] font-bold uppercase mb-4 border-b-2 border-primary pb-2 flex items-center gap-2">
           <span className="material-symbols-outlined">label</span>
           Daftar Kategori Aktif ({categories.length})
@@ -177,6 +157,26 @@ export default function SettingsPage() {
             </span>
           ))}
         </div>
+      </section>
+
+      {/* Pintasan Arsip */}
+      <section className="neo-border neo-shadow p-6 bg-surface-container-lowest flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h3 className="text-[20px] leading-[24px] font-bold uppercase flex items-center gap-2">
+            <span className="material-symbols-outlined">archive</span>
+            Arsip Tugas
+          </h3>
+          <p className="text-[14px] text-on-surface-variant mt-1">
+            Lihat riwayat tugas-tugas yang telah Anda selesaikan.
+          </p>
+        </div>
+        <Link
+          href="/archive"
+          className="px-6 py-3 bg-secondary-container text-on-secondary-container neo-border text-[14px] uppercase font-bold tracking-[0.05em] active-press neo-shadow-sm flex items-center gap-2"
+        >
+          Buka Arsip
+          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </Link>
       </section>
     </div>
   );
