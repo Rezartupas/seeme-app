@@ -12,6 +12,11 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "See Me Reminder",
   description: "Aplikasi To-Do List berbasis Kalender dengan Matriks Eisenhower",
+  icons: {
+    icon: "/seeme-logo.png",
+    shortcut: "/seeme-logo.png",
+    apple: "/seeme-logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

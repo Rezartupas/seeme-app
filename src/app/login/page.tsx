@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -39,11 +40,19 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4">
       {/* Brand Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-[48px] leading-[52px] font-black tracking-widest text-primary">
+      <div className="flex flex-col items-center mb-8">
+        <Image
+          src="/seeme-logo.png"
+          alt="See Me Logo"
+          width={64}
+          height={64}
+          className="w-16 h-16 object-contain border-2 border-primary shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mb-3 bg-surface"
+          priority
+        />
+        <h1 className="text-[48px] leading-[52px] font-black tracking-widest text-primary text-center">
           SEE ME
         </h1>
-        <p className="text-[14px] leading-[16px] uppercase font-bold text-on-surface-variant tracking-[0.05em] mt-1">
+        <p className="text-[14px] leading-[16px] uppercase font-bold text-on-surface-variant tracking-[0.05em] mt-1 text-center">
           Manifesto Produktivitas & Pengingat
         </p>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTaskContext } from "@/lib/task-context";
 
@@ -29,13 +30,23 @@ export function Sidebar() {
 
   return (
     <nav className="hidden md:flex flex-col fixed left-0 top-0 h-full z-40 bg-surface text-primary border-r-2 border-primary shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] w-64">
-      <div className="p-4 border-b-2 border-primary mb-4">
-        <h1 className="text-[48px] leading-[52px] font-black tracking-widest text-primary" style={{ letterSpacing: "-0.02em" }}>
-          SEE ME
-        </h1>
-        <p className="text-[14px] leading-[16px] uppercase font-bold text-on-surface-variant tracking-[0.05em]">
-          Manifesto Produktivitas
-        </p>
+      <div className="p-4 border-b-2 border-primary mb-4 flex items-center gap-3">
+        <Image
+          src="/seeme-logo.png"
+          alt="See Me Logo"
+          width={48}
+          height={48}
+          className="w-12 h-12 object-contain rounded-none border border-primary shrink-0"
+          priority
+        />
+        <div>
+          <h1 className="text-[32px] leading-[34px] font-black tracking-wider text-primary" style={{ letterSpacing: "-0.02em" }}>
+            SEE ME
+          </h1>
+          <p className="text-[12px] leading-[14px] uppercase font-bold text-on-surface-variant tracking-[0.05em]">
+            Manifesto Produktivitas
+          </p>
+        </div>
       </div>
       <div className="flex-1 flex flex-col gap-2 px-2">
         {NAV_ITEMS.map((item) => {
@@ -93,9 +104,19 @@ export function Sidebar() {
 
 export function TopBar() {
   return (
-    <header className="md:hidden fixed top-0 left-0 w-full z-50 flex justify-between items-center px-[16px] h-[44px] bg-surface border-b-2 border-primary shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <div className="text-[24px] leading-[28px] font-bold uppercase tracking-tighter text-primary">
-        SEE ME REMINDER
+    <header className="md:hidden fixed top-0 left-0 w-full z-50 flex justify-between items-center px-[16px] h-[52px] bg-surface border-b-2 border-primary shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <div className="flex items-center gap-2">
+        <Image
+          src="/seeme-logo.png"
+          alt="See Me Logo"
+          width={28}
+          height={28}
+          className="w-7 h-7 object-contain border border-primary shrink-0"
+          priority
+        />
+        <div className="text-[20px] leading-[24px] font-bold uppercase tracking-tight text-primary">
+          SEE ME REMINDER
+        </div>
       </div>
       <div className="flex gap-4">
         <span className="material-symbols-outlined text-primary hover:bg-secondary-container transition-transform active:translate-x-1 active:translate-y-1 p-1 cursor-pointer">
