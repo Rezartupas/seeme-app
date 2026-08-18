@@ -25,6 +25,7 @@ interface TaskContextValue {
   deleteTask: (id: string) => Promise<void>;
   restoreTasks: (ids: string[]) => Promise<void>;
   deleteTasks: (ids: string[]) => Promise<void>;
+  rescheduleTask: (id: string, newDate: string) => Promise<void>;
   addCategory: (cat: Omit<Category, "id">) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   getTasksByDate: (date: string) => Task[];
@@ -303,6 +304,29 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     [supabase, fetchUserData]
   );
 
+  const rescheduleTask = useCallback(
+    async (id: string, newDate: string) => {
+      setTasks((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, date: newDate } : t))
+      );
+      try {
+        const { error } = await supabase
+          .from("tasks")
+          .update({
+            date: newDate,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", id);
+
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error rescheduling task:", err);
+        await fetchUserData();
+      }
+    },
+    [supabase, fetchUserData]
+  );
+
   const addCategory = useCallback(
     async (cat: Omit<Category, "id">) => {
       if (!user) return;
@@ -378,6 +402,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         deleteTask,
         restoreTasks,
         deleteTasks,
+        rescheduleTask,
         addCategory,
         deleteCategory,
         getTasksByDate,
