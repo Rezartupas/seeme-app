@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTaskContext } from "@/lib/task-context";
 
 const NAV_ITEMS = [
   { href: "/", icon: "dashboard", label: "Beranda" },
@@ -23,6 +24,8 @@ function NavIcon({ icon, filled }: { icon: string; filled: boolean }) {
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { profile } = useTaskContext();
+  const isConnected = Boolean(profile?.telegram_chat_id);
 
   return (
     <nav className="hidden md:flex flex-col fixed left-0 top-0 h-full z-40 bg-surface text-primary border-r-2 border-primary shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] w-64">
@@ -54,13 +57,22 @@ export function Sidebar() {
         })}
       </div>
       <div className="px-2 pb-4 mt-auto">
-        <Link
-          href="/settings"
-          className="w-full py-3 mb-4 bg-priority-delegate text-on-primary text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] neo-border-3 neo-shadow active-press flex items-center justify-center gap-2"
-        >
-          <span className="material-symbols-outlined">sync</span>
-          Sinkron Telegram
-        </Link>
+        {isConnected ? (
+          <div className="w-full py-2.5 mb-4 bg-category-green text-on-primary text-[12px] leading-[14px] uppercase font-bold tracking-[0.05em] neo-border flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+              check_circle
+            </span>
+            Telegram Terhubung
+          </div>
+        ) : (
+          <Link
+            href="/settings"
+            className="w-full py-3 mb-4 bg-priority-delegate text-on-primary text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] neo-border-3 neo-shadow active-press flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined">sync</span>
+            Hubungkan Telegram
+          </Link>
+        )}
         <div className="flex flex-col gap-2 border-t-2 border-primary pt-4">
           <Link
             href="/settings"

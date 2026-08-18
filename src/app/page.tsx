@@ -18,11 +18,12 @@ function formatRelative(dateStr: string) {
 }
 
 export default function DashboardPage() {
-  const { getOverdueTasks, getTodayTasks, getUpcomingTasks, categories } = useTaskContext();
+  const { getOverdueTasks, getTodayTasks, getUpcomingTasks, categories, profile } = useTaskContext();
 
   const overdue = getOverdueTasks();
   const today = getTodayTasks();
   const upcoming = getUpcomingTasks().slice(0, 6);
+  const isTelegramConnected = Boolean(profile?.telegram_chat_id);
 
   const todayStr = new Date().toLocaleDateString("id-ID", {
     day: "numeric",
@@ -49,24 +50,29 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Telegram Promo Card */}
-      <div className="bg-secondary-fixed text-on-secondary-fixed p-6 neo-border neo-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
-        <div className="relative z-10">
-          <h3 className="text-[20px] leading-[24px] font-bold mb-2 flex items-center gap-2">
-            <span className="material-symbols-outlined">qr_code_2</span>
-            Hubungkan Telegram
-          </h3>
-          <p className="text-[16px] leading-[24px] max-w-xl">
-            Dapatkan notifikasi instan dan tambah tugas langsung dari chat. Tetap sinkron tanpa buka aplikasi.
-          </p>
+      {/* Telegram Promo Card - hanya tampil jika belum terhubung */}
+      {!isTelegramConnected && (
+        <div className="bg-secondary-fixed text-on-secondary-fixed p-6 neo-border neo-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
+          <div className="relative z-10">
+            <h3 className="text-[20px] leading-[24px] font-bold mb-2 flex items-center gap-2">
+              <span className="material-symbols-outlined">qr_code_2</span>
+              Hubungkan Telegram
+            </h3>
+            <p className="text-[16px] leading-[24px] max-w-xl">
+              Dapatkan notifikasi instan dan tambah tugas langsung dari chat. Tetap sinkron tanpa buka aplikasi.
+            </p>
+          </div>
+          <Link
+            href="/settings"
+            className="bg-primary text-on-primary text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] py-3 px-6 neo-border-3 neo-shadow active-press whitespace-nowrap z-10"
+          >
+            Hubungkan Sekarang
+          </Link>
+          <div className="absolute -right-10 -bottom-10 opacity-20 transform rotate-12 pointer-events-none">
+            <span className="material-symbols-outlined text-[120px]">send</span>
+          </div>
         </div>
-        <button className="bg-primary text-on-primary text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] py-3 px-6 neo-border-3 neo-shadow active-press whitespace-nowrap z-10">
-          Hubungkan Sekarang
-        </button>
-        <div className="absolute -right-10 -bottom-10 opacity-20 transform rotate-12 pointer-events-none">
-          <span className="material-symbols-outlined text-[120px]">send</span>
-        </div>
-      </div>
+      )}
 
       {/* Bento Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-[16px] mt-4">

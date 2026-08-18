@@ -14,6 +14,7 @@ import { createClient } from "./supabase/client";
 interface TaskContextValue {
   tasks: Task[];
   categories: Category[];
+  profile: any | null;
   loading: boolean;
   user: any | null;
   addTask: (
@@ -35,6 +36,7 @@ const TaskContext = createContext<TaskContextValue | null>(null);
 export function TaskProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any | null>(null);
   const supabase = createClient();
@@ -51,9 +53,18 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       if (!currentUser) {
         setTasks([]);
         setCategories([]);
+        setProfile(null);
         setLoading(false);
         return;
       }
+
+      // Fetch Profile
+      const { data: profData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+      setProfile(profData);
 
       // Fetch Categories
       const { data: catData, error: catErr } = await supabase
@@ -265,6 +276,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       value={{
         tasks,
         categories,
+        profile,
         loading,
         user,
         addTask,
