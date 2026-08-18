@@ -86,16 +86,27 @@ export function Sidebar() {
         )}
         <div className="flex flex-col gap-2 border-t-2 border-primary pt-4">
           <Link
+            href="/archive"
+            className={`flex items-center gap-3 p-2 text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] hover:translate-x-1 transition-transform ${
+              pathname === "/archive"
+                ? "bg-secondary-container text-on-secondary-container border-2 border-primary"
+                : "text-on-surface-variant hover:bg-surface-container-low"
+            }`}
+          >
+            <span className="material-symbols-outlined">archive</span>
+            Arsip
+          </Link>
+          <Link
             href="/settings"
-            className="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container-low text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] hover:translate-x-1 transition-transform"
+            className={`flex items-center gap-3 p-2 text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] hover:translate-x-1 transition-transform ${
+              pathname === "/settings"
+                ? "bg-secondary-container text-on-secondary-container border-2 border-primary"
+                : "text-on-surface-variant hover:bg-surface-container-low"
+            }`}
           >
             <span className="material-symbols-outlined">settings</span>
             Pengaturan
           </Link>
-          <button className="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container-low text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] hover:translate-x-1 transition-transform text-left">
-            <span className="material-symbols-outlined">archive</span>
-            Arsip
-          </button>
         </div>
       </div>
     </nav>
