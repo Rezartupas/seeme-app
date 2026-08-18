@@ -68,40 +68,30 @@ export default function CalendarPage() {
     return map;
   }, [tasks]);
 
-  const prevPeriod = () => {
-    if (viewMode === "week") {
-      const prev = new Date(currentDate);
-      prev.setDate(currentDate.getDate() - 7);
-      setCurrentDate(prev);
-      setSelectedDate(prev);
-    } else if (viewMode === "day") {
-      const prev = new Date(currentDate);
-      prev.setDate(currentDate.getDate() - 1);
-      setCurrentDate(prev);
-      setSelectedDate(prev);
-    } else {
-      const prev = new Date(year, month - 1, 1);
-      setCurrentDate(prev);
-      setSelectedDate(prev);
-    }
+  const prevMonth = () => {
+    const prev = new Date(year, month - 1, 1);
+    setCurrentDate(prev);
+    setSelectedDate(prev);
   };
 
-  const nextPeriod = () => {
-    if (viewMode === "week") {
-      const next = new Date(currentDate);
-      next.setDate(currentDate.getDate() + 7);
-      setCurrentDate(next);
-      setSelectedDate(next);
-    } else if (viewMode === "day") {
-      const next = new Date(currentDate);
-      next.setDate(currentDate.getDate() + 1);
-      setCurrentDate(next);
-      setSelectedDate(next);
-    } else {
-      const next = new Date(year, month + 1, 1);
-      setCurrentDate(next);
-      setSelectedDate(next);
-    }
+  const nextMonth = () => {
+    const next = new Date(year, month + 1, 1);
+    setCurrentDate(next);
+    setSelectedDate(next);
+  };
+
+  const prevWeek = () => {
+    const prev = new Date(currentDate);
+    prev.setDate(currentDate.getDate() - 7);
+    setCurrentDate(prev);
+    setSelectedDate(prev);
+  };
+
+  const nextWeek = () => {
+    const next = new Date(currentDate);
+    next.setDate(currentDate.getDate() + 7);
+    setCurrentDate(next);
+    setSelectedDate(next);
   };
 
   const goToday = () => {
@@ -144,21 +134,29 @@ export default function CalendarPage() {
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 pb-4 border-b-2 border-primary">
         <div className="flex items-center gap-4">
-          <button
-            onClick={prevPeriod}
-            className="p-2 neo-border hover:bg-surface-container-high active-press"
-          >
-            <span className="material-symbols-outlined">chevron_left</span>
-          </button>
+          {viewMode === "month" && (
+            <button
+              onClick={prevMonth}
+              className="p-2 neo-border hover:bg-surface-container-high active-press"
+              title="Bulan sebelumnya"
+              aria-label="Bulan sebelumnya"
+            >
+              <span className="material-symbols-outlined">chevron_left</span>
+            </button>
+          )}
           <h2 className="text-[24px] md:text-[32px] leading-[28px] md:leading-[38px] font-bold text-primary">
             {monthName}
           </h2>
-          <button
-            onClick={nextPeriod}
-            className="p-2 neo-border hover:bg-surface-container-high active-press"
-          >
-            <span className="material-symbols-outlined">chevron_right</span>
-          </button>
+          {viewMode === "month" && (
+            <button
+              onClick={nextMonth}
+              className="p-2 neo-border hover:bg-surface-container-high active-press"
+              title="Bulan berikutnya"
+              aria-label="Bulan berikutnya"
+            >
+              <span className="material-symbols-outlined">chevron_right</span>
+            </button>
+          )}
           <button
             onClick={goToday}
             className="text-[12px] leading-[14px] font-bold uppercase px-3 py-1 neo-border hover:bg-secondary-container active-press"
@@ -364,81 +362,104 @@ export default function CalendarPage() {
       {/* Week View */}
       {viewMode === "week" && (
         <div className="flex flex-col gap-6">
-          {/* Desktop Week Grid (hidden on mobile) */}
-          <div className="hidden md:block w-full neo-border bg-surface">
-            <div className="grid grid-cols-7 border-b-2 border-primary bg-surface-container-high">
-              {weekDates.map((d, i) => {
-                const ds = formatDateToYMD(d);
-                const isSelected = ds === selectedDateStr;
-                const isToday = ds === todayStr;
-                const dayTaskList = tasksByDate[ds] || [];
-                return (
-                  <div
-                    key={i}
-                    onClick={() => {
-                      setSelectedDate(d);
-                      setCurrentDate(d);
-                    }}
-                    className={`p-3 border-r-2 border-primary last:border-r-0 text-center cursor-pointer transition-colors ${
-                      isSelected
-                        ? "bg-secondary-container"
-                        : isToday
-                        ? "bg-surface-container-high"
-                        : "hover:bg-surface-container-low"
-                    }`}
-                  >
-                    <div className="text-[12px] leading-[14px] font-bold uppercase">
-                      {DAYS[i]}
-                    </div>
-                    <div className="text-[20px] leading-[24px] font-bold mt-1">
-                      {d.getDate()}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="grid grid-cols-7 bg-primary gap-[2px] p-[2px]">
-              {weekDates.map((d, i) => {
-                const ds = formatDateToYMD(d);
-                const isSelected = ds === selectedDateStr;
-                const dayTaskList = tasksByDate[ds] || [];
-                return (
-                  <div
-                    key={i}
-                    onClick={() => {
-                      setSelectedDate(d);
-                      setCurrentDate(d);
-                    }}
-                    className={`p-2 min-h-[200px] flex flex-col gap-2 cursor-pointer transition-colors ${
-                      isSelected
-                        ? "bg-secondary-container/30 ring-2 ring-primary inset-0 z-10"
-                        : "bg-surface hover:bg-surface-container-lowest"
-                    }`}
-                  >
-                    {dayTaskList.map((t) => (
-                      <div
-                        key={t.id}
-                        className={`${getQuadrantColor(
-                          t.isImportant,
-                          t.isUrgent
-                        )} px-2 py-2 border-2 border-primary text-[12px] leading-[14px] font-bold ${
-                          t.status === "completed"
-                            ? "line-through opacity-70"
-                            : ""
-                        }`}
-                      >
-                        {t.startTime && (
-                          <div className="text-[10px] opacity-80">
-                            {t.startTime}
-                          </div>
-                        )}
-                        {t.title}
+          {/* Desktop Week Grid with Side Navigation Buttons (hidden on mobile) */}
+          <div className="hidden md:flex items-stretch gap-3">
+            <button
+              onClick={prevWeek}
+              className="w-12 neo-border bg-surface hover:bg-secondary-container active-press flex items-center justify-center cursor-pointer shrink-0 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              title="Minggu sebelumnya"
+              aria-label="Minggu sebelumnya"
+            >
+              <span className="material-symbols-outlined text-[32px] font-black">
+                chevron_left
+              </span>
+            </button>
+
+            <div className="flex-1 neo-border bg-surface">
+              <div className="grid grid-cols-7 border-b-2 border-primary bg-surface-container-high">
+                {weekDates.map((d, i) => {
+                  const ds = formatDateToYMD(d);
+                  const isSelected = ds === selectedDateStr;
+                  const isToday = ds === todayStr;
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => {
+                        setSelectedDate(d);
+                        setCurrentDate(d);
+                      }}
+                      className={`p-3 border-r-2 border-primary last:border-r-0 text-center cursor-pointer transition-colors ${
+                        isSelected
+                          ? "bg-secondary-container"
+                          : isToday
+                          ? "bg-surface-container-high"
+                          : "hover:bg-surface-container-low"
+                      }`}
+                    >
+                      <div className="text-[12px] leading-[14px] font-bold uppercase">
+                        {DAYS[i]}
                       </div>
-                    ))}
-                  </div>
-                );
-              })}
+                      <div className="text-[20px] leading-[24px] font-bold mt-1">
+                        {d.getDate()}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-7 bg-primary gap-[2px] p-[2px]">
+                {weekDates.map((d, i) => {
+                  const ds = formatDateToYMD(d);
+                  const isSelected = ds === selectedDateStr;
+                  const dayTaskList = tasksByDate[ds] || [];
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => {
+                        setSelectedDate(d);
+                        setCurrentDate(d);
+                      }}
+                      className={`p-2 min-h-[200px] flex flex-col gap-2 cursor-pointer transition-colors ${
+                        isSelected
+                          ? "bg-secondary-container/30 ring-2 ring-primary inset-0 z-10"
+                          : "bg-surface hover:bg-surface-container-lowest"
+                      }`}
+                    >
+                      {dayTaskList.map((t) => (
+                        <div
+                          key={t.id}
+                          className={`${getQuadrantColor(
+                            t.isImportant,
+                            t.isUrgent
+                          )} px-2 py-2 border-2 border-primary text-[12px] leading-[14px] font-bold ${
+                            t.status === "completed"
+                              ? "line-through opacity-70"
+                              : ""
+                          }`}
+                        >
+                          {t.startTime && (
+                            <div className="text-[10px] opacity-80">
+                              {t.startTime}
+                            </div>
+                          )}
+                          {t.title}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+
+            <button
+              onClick={nextWeek}
+              className="w-12 neo-border bg-surface hover:bg-secondary-container active-press flex items-center justify-center cursor-pointer shrink-0 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              title="Minggu berikutnya"
+              aria-label="Minggu berikutnya"
+            >
+              <span className="material-symbols-outlined text-[32px] font-black">
+                chevron_right
+              </span>
+            </button>
           </div>
 
           {/* Desktop Selected Day Task Details */}
@@ -481,52 +502,76 @@ export default function CalendarPage() {
 
           {/* Mobile Week View (Tabs + Selected Day Tasks) */}
           <div className="md:hidden flex flex-col gap-4">
-            <div className="grid grid-cols-7 gap-1 bg-surface p-1 neo-border">
-              {weekDates.map((d, i) => {
-                const ds = formatDateToYMD(d);
-                const isSelected = ds === selectedDateStr;
-                const isToday = ds === todayStr;
-                const dayTaskList = tasksByDate[ds] || [];
+            <div className="flex items-center gap-1.5 bg-surface p-1.5 neo-border">
+              <button
+                onClick={prevWeek}
+                className="w-8 h-10 neo-border bg-surface hover:bg-secondary-container active-press flex items-center justify-center cursor-pointer shrink-0 transition-colors"
+                title="Minggu sebelumnya"
+                aria-label="Minggu sebelumnya"
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  chevron_left
+                </span>
+              </button>
 
-                return (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setSelectedDate(d);
-                      setCurrentDate(d);
-                    }}
-                    className={`p-2 flex flex-col items-center justify-center neo-border transition-all ${
-                      isSelected
-                        ? "bg-secondary-container border-2 border-primary shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                        : isToday
-                        ? "bg-surface-container-high border border-primary"
-                        : "bg-surface hover:bg-surface-container-lowest border-transparent"
-                    }`}
-                  >
-                    <span className="text-[10px] font-bold uppercase text-on-surface-variant">
-                      {DAYS[i]}
-                    </span>
-                    <span
-                      className={`text-[16px] font-black ${
-                        isSelected ? "text-primary" : ""
+              <div className="grid grid-cols-7 gap-1 flex-1">
+                {weekDates.map((d, i) => {
+                  const ds = formatDateToYMD(d);
+                  const isSelected = ds === selectedDateStr;
+                  const isToday = ds === todayStr;
+                  const dayTaskList = tasksByDate[ds] || [];
+
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setSelectedDate(d);
+                        setCurrentDate(d);
+                      }}
+                      className={`p-1.5 flex flex-col items-center justify-center neo-border transition-all ${
+                        isSelected
+                          ? "bg-secondary-container border-2 border-primary shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                          : isToday
+                          ? "bg-surface-container-high border border-primary"
+                          : "bg-surface hover:bg-surface-container-lowest border-transparent"
                       }`}
                     >
-                      {d.getDate()}
-                    </span>
-                    <div className="flex gap-0.5 mt-1 min-h-[6px]">
-                      {dayTaskList.slice(0, 3).map((t) => (
-                        <span
-                          key={t.id}
-                          className={`w-1.5 h-1.5 rounded-full ${getQuadrantDotColor(
-                            t.isImportant,
-                            t.isUrgent
-                          )}`}
-                        />
-                      ))}
-                    </div>
-                  </button>
-                );
-              })}
+                      <span className="text-[9px] font-bold uppercase text-on-surface-variant leading-tight">
+                        {DAYS[i]}
+                      </span>
+                      <span
+                        className={`text-[14px] font-black leading-tight ${
+                          isSelected ? "text-primary" : ""
+                        }`}
+                      >
+                        {d.getDate()}
+                      </span>
+                      <div className="flex gap-0.5 mt-0.5 min-h-[5px]">
+                        {dayTaskList.slice(0, 3).map((t) => (
+                          <span
+                            key={t.id}
+                            className={`w-1.5 h-1.5 rounded-full ${getQuadrantDotColor(
+                              t.isImportant,
+                              t.isUrgent
+                            )}`}
+                          />
+                        ))}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={nextWeek}
+                className="w-8 h-10 neo-border bg-surface hover:bg-secondary-container active-press flex items-center justify-center cursor-pointer shrink-0 transition-colors"
+                title="Minggu berikutnya"
+                aria-label="Minggu berikutnya"
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  chevron_right
+                </span>
+              </button>
             </div>
 
             {/* List Tugas Hari Terpilih di Mobile Week View */}
