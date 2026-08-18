@@ -6,7 +6,7 @@ import { useTaskContext } from "@/lib/task-context";
 
 export default function NewTaskPage() {
   const router = useRouter();
-  const { addTask, categories, addCategory } = useTaskContext();
+  const { addTask, categories, addCategory, deleteCategory } = useTaskContext();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -204,25 +204,48 @@ export default function NewTaskPage() {
           <div className="flex flex-col gap-2 mt-4">
             <label className="text-[20px] leading-[24px] font-bold uppercase tracking-tight">Kategori</label>
             <div className="flex flex-wrap gap-3 mt-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => toggleCat(cat.id)}
-                  className={`px-4 py-2 border-2 border-primary text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] transition-colors hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
-                    selectedCats.includes(cat.id)
-                      ? "text-white"
-                      : "text-primary bg-surface-container-lowest"
-                  }`}
-                  style={selectedCats.includes(cat.id) ? { backgroundColor: cat.color } : {}}
-                >
-                  {cat.name}
-                </button>
-              ))}
+              {categories.map((cat) => {
+                const isSelected = selectedCats.includes(cat.id);
+                return (
+                  <div
+                    key={cat.id}
+                    className={`border-2 border-primary text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] transition-all inline-flex items-center neo-shadow-sm ${
+                      isSelected
+                        ? "text-white"
+                        : "text-primary bg-surface-container-lowest"
+                    }`}
+                    style={isSelected ? { backgroundColor: cat.color } : {}}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => toggleCat(cat.id)}
+                      className="px-3 py-2 cursor-pointer flex-1 text-left"
+                    >
+                      {cat.name}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        const confirm = window.confirm(`Hapus kategori "${cat.name}"?`);
+                        if (confirm) {
+                          setSelectedCats((prev) => prev.filter((id) => id !== cat.id));
+                          await deleteCategory(cat.id);
+                        }
+                      }}
+                      className="px-2 py-2 hover:bg-black/20 text-current cursor-pointer transition-colors border-l border-primary/30"
+                      title={`Hapus kategori ${cat.name}`}
+                      aria-label={`Hapus kategori ${cat.name}`}
+                    >
+                      <span className="material-symbols-outlined text-[16px] align-middle">close</span>
+                    </button>
+                  </div>
+                );
+              })}
               <button
                 type="button"
                 onClick={() => setShowNewCat(!showNewCat)}
-                className="px-4 py-2 border-2 border-primary text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] text-primary bg-surface-container-lowest hover:bg-secondary-container transition-colors"
+                className="px-4 py-2 border-2 border-primary text-[14px] leading-[16px] uppercase font-bold tracking-[0.05em] text-primary bg-surface-container-lowest hover:bg-secondary-container transition-colors neo-shadow-sm"
               >
                 + Tambah Baru
               </button>

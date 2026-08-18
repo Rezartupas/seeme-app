@@ -9,7 +9,7 @@ import { useTaskContext } from "@/lib/task-context";
 export default function SettingsPage() {
   const router = useRouter();
   const supabase = createClient();
-  const { user, profile, categories, refreshData } = useTaskContext();
+  const { user, profile, categories, deleteCategory, refreshData } = useTaskContext();
   const [linkCode, setLinkCode] = useState("");
   const [generating, setGenerating] = useState(false);
 
@@ -146,17 +146,34 @@ export default function SettingsPage() {
           <span className="material-symbols-outlined">label</span>
           Daftar Kategori Aktif ({categories.length})
         </h3>
-        <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <span
-              key={cat.id}
-              className="text-[14px] font-bold uppercase px-3 py-1 neo-border text-on-primary"
-              style={{ backgroundColor: cat.color }}
-            >
-              {cat.name}
-            </span>
-          ))}
-        </div>
+        {categories.length === 0 ? (
+          <p className="text-[14px] text-on-surface-variant">Belum ada kategori tersimpan.</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <span
+                key={cat.id}
+                className="text-[14px] font-bold uppercase pl-3 pr-2 py-1 neo-border text-on-primary inline-flex items-center gap-2"
+                style={{ backgroundColor: cat.color }}
+              >
+                <span>{cat.name}</span>
+                <button
+                  onClick={async () => {
+                    const confirm = window.confirm(`Hapus kategori "${cat.name}"?`);
+                    if (confirm) {
+                      await deleteCategory(cat.id);
+                    }
+                  }}
+                  className="hover:bg-black/20 rounded px-1 transition-colors leading-none cursor-pointer"
+                  title="Hapus kategori"
+                  aria-label={`Hapus kategori ${cat.name}`}
+                >
+                  <span className="material-symbols-outlined text-[16px] align-middle">close</span>
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Pintasan Arsip */}
