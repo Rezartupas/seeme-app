@@ -516,12 +516,46 @@ export default function CalendarPage() {
       {/* Day View */}
       {viewMode === "day" && (
         <div className="w-full">
-          <div className="text-center mb-6">
-            <div className="text-[14px] uppercase font-bold text-on-surface-variant tracking-[0.05em]">
-              {selectedDate.toLocaleDateString("id-ID", { weekday: "long" })}
+          <div className="text-center mb-6 flex flex-col items-center">
+            <div className="text-[14px] uppercase font-bold text-on-surface-variant tracking-[0.05em] mb-1">
+              {selectedDate.toLocaleDateString("id-ID", {
+                weekday: "long",
+                month: "long",
+                year: "numeric",
+              })}
             </div>
-            <div className="text-[48px] leading-[52px] font-bold text-primary">
-              {selectedDate.getDate()}
+            <div className="flex items-center justify-center gap-4">
+              <button
+                onClick={() => {
+                  const prev = new Date(selectedDate);
+                  prev.setDate(selectedDate.getDate() - 1);
+                  setSelectedDate(prev);
+                  setCurrentDate(prev);
+                }}
+                className="w-10 h-10 neo-border bg-surface hover:bg-secondary-container active-press flex items-center justify-center cursor-pointer"
+                title="Hari sebelumnya"
+                aria-label="Hari sebelumnya"
+              >
+                <span className="material-symbols-outlined text-[24px]">chevron_left</span>
+              </button>
+
+              <div className="text-[48px] leading-[52px] font-black text-primary min-w-[70px] text-center">
+                {selectedDate.getDate()}
+              </div>
+
+              <button
+                onClick={() => {
+                  const next = new Date(selectedDate);
+                  next.setDate(selectedDate.getDate() + 1);
+                  setSelectedDate(next);
+                  setCurrentDate(next);
+                }}
+                className="w-10 h-10 neo-border bg-surface hover:bg-secondary-container active-press flex items-center justify-center cursor-pointer"
+                title="Hari berikutnya"
+                aria-label="Hari berikutnya"
+              >
+                <span className="material-symbols-outlined text-[24px]">chevron_right</span>
+              </button>
             </div>
           </div>
           <div className="flex flex-col gap-4 max-w-2xl mx-auto">
