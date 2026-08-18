@@ -157,14 +157,3 @@ export function BottomNav() {
     </nav>
   );
 }
-
-export function FAB() {
-  return (
-    <Link
-      href="/task/new"
-      className="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-primary text-on-primary rounded-full flex items-center justify-center neo-border-3 neo-shadow active-press z-40"
-    >
-      <span className="material-symbols-outlined text-[32px]">add</span>
-    </Link>
-  );
-}

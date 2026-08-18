@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { TaskProvider } from "@/lib/task-context";
-import { Sidebar, TopBar, BottomNav, FAB } from "./navigation";
+import { Sidebar, TopBar, BottomNav } from "./navigation";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,7 +19,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="pt-[60px] md:pt-0 md:pl-64 min-h-screen flex flex-col pb-24 md:pb-0">
         {children}
       </main>
-      <FAB />
       <BottomNav />
     </TaskProvider>
   );
