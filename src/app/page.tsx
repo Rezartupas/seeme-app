@@ -43,8 +43,19 @@ export default function DashboardPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [tzLabel, setTzLabel] = useState("");
 
   useEffect(() => {
+    // Detect browser timezone label (e.g. "WIB", "WITA", "SGT", "JST")
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const short = new Intl.DateTimeFormat("id-ID", {
+      timeZoneName: "short",
+      timeZone: tz,
+    })
+      .formatToParts(new Date())
+      .find((p) => p.type === "timeZoneName");
+    setTzLabel(short?.value || tz);
+
     setCurrentTime(new Date());
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -71,13 +82,12 @@ export default function DashboardPage() {
   const today = todayAll.filter(matchesSearch);
   const upcoming = upcomingAll.filter(matchesSearch).slice(0, 6);
 
-  // Format Date & Time WIB (24 Hour)
+  // Format Date & Time (auto-detect timezone from browser)
   const formattedDate = currentTime
     ? currentTime.toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
         year: "numeric",
-        timeZone: "Asia/Jakarta",
       })
     : "";
 
@@ -87,9 +97,10 @@ export default function DashboardPage() {
         minute: "2-digit",
         second: "2-digit",
         hour12: false,
-        timeZone: "Asia/Jakarta",
-      }) + " WIB"
-    : "--:--:-- WIB";
+      }) +
+      " " +
+      tzLabel
+    : "--:--:--";
 
   return (
     <div className="p-[16px] md:p-[32px] flex-1 flex flex-col gap-[16px]">
