@@ -23,6 +23,8 @@ interface TaskContextValue {
   ) => Promise<void>;
   toggleTask: (id: string) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
+  restoreTasks: (ids: string[]) => Promise<void>;
+  deleteTasks: (ids: string[]) => Promise<void>;
   addCategory: (cat: Omit<Category, "id">) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   getTasksByDate: (date: string) => Task[];
@@ -254,6 +256,47 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     [supabase, fetchUserData]
   );
 
+  const restoreTasks = useCallback(
+    async (ids: string[]) => {
+      if (!ids.length) return;
+      const idSet = new Set(ids);
+      setTasks((prev) =>
+        prev.map((t) => (idSet.has(t.id) ? { ...t, status: "pending" } : t))
+      );
+      try {
+        const { error } = await supabase
+          .from("tasks")
+          .update({
+            status: "pending",
+            updated_at: new Date().toISOString(),
+          })
+          .in("id", ids);
+
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error restoring tasks:", err);
+        await fetchUserData();
+      }
+    },
+    [supabase, fetchUserData]
+  );
+
+  const deleteTasks = useCallback(
+    async (ids: string[]) => {
+      if (!ids.length) return;
+      const idSet = new Set(ids);
+      setTasks((prev) => prev.filter((t) => !idSet.has(t.id)));
+      try {
+        const { error } = await supabase.from("tasks").delete().in("id", ids);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error deleting multiple tasks:", err);
+        await fetchUserData();
+      }
+    },
+    [supabase, fetchUserData]
+  );
+
   const addCategory = useCallback(
     async (cat: Omit<Category, "id">) => {
       if (!user) return;
@@ -319,6 +362,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         addTask,
         toggleTask,
         deleteTask,
+        restoreTasks,
+        deleteTasks,
         addCategory,
         deleteCategory,
         getTasksByDate,
