@@ -16,19 +16,26 @@ export function FriendCard({ friendship, currentUserId }: FriendCardProps) {
     friendship.requesterId === currentUserId
       ? friendship.addresseeId
       : friendship.requesterId;
+  const profile = friendship.friendProfile;
+  const displayName = profile?.name || (profile?.username ? `@${profile.username}` : `${friendId.slice(0, 8)}…`);
 
   return (
     <div className="flex items-center justify-between p-3 bg-surface-container-low border-2 border-primary shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
       <button
         onClick={() => router.push(`/friends/${friendId}`)}
-        className="flex items-center gap-3 flex-1 text-left hover:opacity-80 transition-opacity"
+        className="flex items-center gap-3 flex-1 text-left hover:opacity-80 transition-opacity min-w-0"
       >
-        <span className="material-symbols-outlined text-[32px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <span className="material-symbols-outlined text-[32px] text-primary shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
           account_circle
         </span>
-        <span className="text-[14px] font-bold uppercase tracking-[0.04em] truncate">
-          {friendId.slice(0, 8)}…
-        </span>
+        <div className="min-w-0">
+          <div className="text-[14px] font-bold uppercase tracking-[0.04em] truncate">
+            {displayName}
+          </div>
+          {profile?.username && profile.name && (
+            <div className="text-[11px] text-on-surface-variant">@{profile.username}</div>
+          )}
+        </div>
       </button>
       <div className="flex items-center gap-2">
         <button

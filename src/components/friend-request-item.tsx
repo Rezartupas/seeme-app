@@ -10,16 +10,19 @@ interface FriendRequestItemProps {
 
 export function FriendRequestItem({ friendship, direction }: FriendRequestItemProps) {
   const { acceptFriendRequest, rejectFriendRequest, cancelFriendRequest } = useSocialContext();
+  const profile = friendship.friendProfile;
+  const fallbackId = direction === "incoming" ? friendship.requesterId : friendship.addresseeId;
+  const displayName = profile?.name || (profile?.username ? `@${profile.username}` : `${fallbackId.slice(0, 8)}…`);
 
   return (
     <div className="flex items-center justify-between p-3 bg-surface-container-low border-2 border-primary shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        <span className="material-symbols-outlined text-[32px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <span className="material-symbols-outlined text-[32px] text-primary shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
           account_circle
         </span>
-        <div>
+        <div className="min-w-0">
           <div className="text-[13px] font-bold uppercase tracking-[0.04em] truncate">
-            {direction === "incoming" ? friendship.requesterId.slice(0, 8) : friendship.addresseeId.slice(0, 8)}…
+            {displayName}
           </div>
           <div className="text-[11px] text-on-surface-variant uppercase tracking-[0.03em]">
             {direction === "incoming" ? "Ingin berteman dengan Anda" : "Permintaan dikirim"}

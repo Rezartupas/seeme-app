@@ -144,16 +144,42 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     if (error) { console.error("fetchFriends:", error); return; }
 
     const rows = (data as DbFriendship[]) || [];
-    setFriends(rows.filter((r) => r.status === "accepted").map(mapFriendship));
+    
+    // Collect other user IDs to batch fetch public_profiles
+    const otherUserIds = Array.from(
+      new Set(
+        rows.map((r) => (r.requester_id === currentUser.id ? r.addressee_id : r.requester_id))
+      )
+    );
+
+    let profileMap: Record<string, PublicProfile> = {};
+    if (otherUserIds.length > 0) {
+      const { data: profs } = await supabase
+        .from("public_profiles")
+        .select("id, username, name, avatar_url")
+        .in("id", otherUserIds);
+      if (profs) {
+        profileMap = Object.fromEntries((profs as PublicProfile[]).map((p) => [p.id, p]));
+      }
+    }
+
+    const attachProfile = (f: Friendship) => {
+      const otherId = f.requesterId === currentUser.id ? f.addresseeId : f.requesterId;
+      return { ...f, friendProfile: profileMap[otherId] };
+    };
+
+    setFriends(rows.filter((r) => r.status === "accepted").map(mapFriendship).map(attachProfile));
     setIncomingRequests(
       rows
         .filter((r) => r.status === "pending" && r.addressee_id === currentUser.id)
         .map(mapFriendship)
+        .map(attachProfile)
     );
     setOutgoingRequests(
       rows
         .filter((r) => r.status === "pending" && r.requester_id === currentUser.id)
         .map(mapFriendship)
+        .map(attachProfile)
     );
   }, [supabase]);
 

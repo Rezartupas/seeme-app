@@ -60,6 +60,7 @@ export interface Friendship {
   status: "pending" | "accepted";
   createdAt: string;
   respondedAt: string | null;
+  friendProfile?: PublicProfile;
 }
 
 export interface Activity {
