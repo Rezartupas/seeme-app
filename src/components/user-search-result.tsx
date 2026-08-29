@@ -50,10 +50,13 @@ export function UserSearchResult({ profile, existingFriendshipId, isPending }: U
         </span>
         <div>
           <div className="text-[14px] font-bold uppercase tracking-[0.04em] truncate">
-            {profile.name ?? profile.username ?? profile.id.slice(0, 8)}
+            {profile.name ?? profile.username ?? profile.email ?? profile.id.slice(0, 8)}
           </div>
           {profile.username && (
             <div className="text-[11px] text-on-surface-variant">@{profile.username}</div>
+          )}
+          {!profile.username && profile.email && (
+            <div className="text-[11px] text-on-surface-variant truncate">{profile.email}</div>
           )}
         </div>
       </div>

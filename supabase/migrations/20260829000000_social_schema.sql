@@ -73,9 +73,9 @@ create table if not exists public.notifications (
 );
 create index if not exists notifications_user_read_idx on public.notifications(user_id, is_read);
 
--- 8. public_profiles view (security_invoker = false ensures safe public discovery of id, username, name, avatar_url)
+-- 8. public_profiles view (security_invoker = false ensures safe public discovery of id, username, name, email, avatar_url)
 create or replace view public.public_profiles with (security_invoker = false) as
-  select id, username, name, avatar_url from public.profiles;
+  select id, username, name, email, avatar_url from public.profiles;
 
 -- 9. Enable RLS
 alter table public.friendships enable row level security;

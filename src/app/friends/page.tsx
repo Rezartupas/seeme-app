@@ -70,7 +70,7 @@ export default function FriendsPage() {
             <input
               className="bg-surface-container-low p-3 text-[16px] neo-input w-full placeholder-outline"
               type="text"
-              placeholder="Nama atau username..."
+              placeholder="Nama, username, atau email..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />

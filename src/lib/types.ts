@@ -50,6 +50,7 @@ export interface PublicProfile {
   id: string;
   username: string | null;
   name: string | null;
+  email?: string | null;
   avatar_url: string | null;
 }
 

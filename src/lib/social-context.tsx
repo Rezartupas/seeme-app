@@ -248,10 +248,11 @@ export function SocialProvider({ children }: { children: ReactNode }) {
 
   const searchUsers = useCallback(async (q: string): Promise<PublicProfile[]> => {
     if (!q.trim() || !user) return [];
+    const term = q.trim();
     const { data, error } = await supabase
       .from("public_profiles")
-      .select("id, username, name, avatar_url")
-      .or(`name.ilike.%${q}%,username.ilike.%${q}%`)
+      .select("id, username, name, email, avatar_url")
+      .or(`name.ilike.%${term}%,username.ilike.%${term}%,email.ilike.%${term}%`)
       .neq("id", user.id)
       .limit(20);
 
