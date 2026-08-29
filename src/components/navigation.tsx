@@ -4,11 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTaskContext } from "@/lib/task-context";
+import { NotificationBell } from "./notification-bell";
 
 const NAV_ITEMS = [
   { href: "/", icon: "dashboard", label: "Beranda" },
   { href: "/calendar", icon: "calendar_month", label: "Kalender" },
   { href: "/matrix", icon: "grid_view", label: "Matriks" },
+  { href: "/friends", icon: "group", label: "Teman" },
   { href: "/task/new", icon: "add_box", label: "Tugas" },
 ];
 
@@ -114,9 +116,6 @@ export function Sidebar() {
 }
 
 export function TopBar() {
-  const { getOverdueTasks } = useTaskContext();
-  const overdueCount = getOverdueTasks().length;
-
   return (
     <header className="md:hidden fixed top-0 left-0 w-full z-50 flex justify-between items-center px-[16px] h-[52px] bg-surface border-b-2 border-primary shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="flex items-center gap-2">
@@ -133,23 +132,7 @@ export function TopBar() {
         </div>
       </div>
       <div className="flex gap-3 items-center">
-        <Link
-          href="/"
-          className="relative p-1 text-primary hover:bg-secondary-container transition-transform active:translate-x-1 active:translate-y-1 cursor-pointer flex items-center justify-center"
-          title={overdueCount > 0 ? `${overdueCount} tugas terlewat!` : "Tidak ada tugas terlewat"}
-        >
-          <span
-            className="material-symbols-outlined text-[24px]"
-            style={overdueCount > 0 ? { fontVariationSettings: "'FILL' 1" } : undefined}
-          >
-            notifications
-          </span>
-          {overdueCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-error text-on-error text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-primary animate-pulse">
-              {overdueCount > 9 ? "9+" : overdueCount}
-            </span>
-          )}
-        </Link>
+        <NotificationBell />
         <Link href="/settings">
           <span className="material-symbols-outlined text-primary hover:bg-secondary-container transition-transform active:translate-x-1 active:translate-y-1 p-1 cursor-pointer">
             settings
