@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { TaskProvider } from "@/lib/task-context";
+import { SocialProvider } from "@/lib/social-context";
 import { Sidebar, TopBar, BottomNav } from "./navigation";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -14,12 +15,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <TaskProvider>
-      <TopBar />
-      <Sidebar />
-      <main className="pt-[60px] md:pt-0 md:pl-64 min-h-screen flex flex-col pb-24 md:pb-0">
-        {children}
-      </main>
-      <BottomNav />
+      <SocialProvider>
+        <TopBar />
+        <Sidebar />
+        <main className="pt-[60px] md:pt-0 md:pl-64 min-h-screen flex flex-col pb-24 md:pb-0">
+          {children}
+        </main>
+        <BottomNav />
+      </SocialProvider>
     </TaskProvider>
   );
 }
