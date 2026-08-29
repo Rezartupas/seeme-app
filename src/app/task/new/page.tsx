@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTaskContext } from "@/lib/task-context";
+import { ShareToggle } from "@/components/share-toggle";
 
 export default function NewTaskPage() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function NewTaskPage() {
   const [reminderAt, setReminderAt] = useState("");
   const [isUrgent, setIsUrgent] = useState(false);
   const [isImportant, setIsImportant] = useState(false);
+  const [isShared, setIsShared] = useState(false);
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
   const [showNewCat, setShowNewCat] = useState(false);
   const [newCatName, setNewCatName] = useState("");
@@ -49,7 +51,7 @@ export default function NewTaskPage() {
         reminderAt: reminderAt ? new Date(reminderAt).toISOString() : undefined,
         isUrgent,
         isImportant,
-        isShared: false,
+        isShared,
         status: "pending",
         categoryIds: selectedCats,
       });
@@ -282,6 +284,14 @@ export default function NewTaskPage() {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Bagikan ke Teman */}
+          <div className="border-t-2 border-primary pt-6">
+            <ShareToggle checked={isShared} onChange={setIsShared} />
+            <p className="text-[12px] text-on-surface-variant mt-2 uppercase tracking-[0.03em]">
+              Teman yang sudah terhubung bisa melihat tugas ini di kalender mereka
+            </p>
           </div>
 
           {/* Tombol Aksi */}

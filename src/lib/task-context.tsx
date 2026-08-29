@@ -216,6 +216,24 @@ export function TaskProvider({ children }: { children: ReactNode }) {
           await supabase.from("task_categories").insert(junctions);
         }
 
+        if (t.isShared) {
+          const startIso = t.date && t.startTime
+            ? new Date(`${t.date}T${t.startTime}`).toISOString()
+            : null;
+          const endIso = t.date && t.endTime
+            ? new Date(`${t.date}T${t.endTime}`).toISOString()
+            : null;
+          await supabase.from("activities").upsert({
+            user_id: user.id,
+            task_id: newTask.id,
+            type: "task_shared",
+            title: t.title,
+            status: t.status,
+            start_time: startIso,
+            end_time: endIso,
+          }, { onConflict: "task_id" });
+        }
+
         await fetchUserData();
       } catch (err) {
         console.error("Error adding task to Supabase:", err);
@@ -245,6 +263,22 @@ export function TaskProvider({ children }: { children: ReactNode }) {
           .eq("id", id);
 
         if (error) throw error;
+
+        // Sync activity snapshot if task is shared
+        const { data: actRow } = await supabase
+          .from("activities")
+          .select("id")
+          .eq("task_id", id)
+          .maybeSingle();
+        if (actRow) {
+          await supabase
+            .from("activities")
+            .update({
+              status: nextStatus,
+              type: nextStatus === "completed" ? "task_completed" : "task_shared",
+            })
+            .eq("task_id", id);
+        }
       } catch (err) {
         console.error("Error toggling task status:", err);
         await fetchUserData();
