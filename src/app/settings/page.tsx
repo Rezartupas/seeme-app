@@ -15,6 +15,15 @@ export default function SettingsPage() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [savingName, setSavingName] = useState(false);
+  const [username, setUsername] = useState(profile?.username ?? "");
+  const [usernameSaving, setUsernameSaving] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (profile?.username) {
+      setUsername(profile.username);
+    }
+  }, [profile?.username]);
 
   const displayName =
     profile?.name ||
@@ -37,6 +46,26 @@ export default function SettingsPage() {
     } finally {
       setSavingName(false);
     }
+  };
+
+  const handleSaveUsername = async () => {
+    if (!username.trim() || !user) return;
+    setUsernameSaving(true);
+    setUsernameError(null);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ username: username.trim().toLowerCase() })
+      .eq("id", user.id);
+    if (error) {
+      if (error.message.includes("unique") || error.message.includes("duplicate")) {
+        setUsernameError("Username sudah dipakai");
+      } else {
+        setUsernameError("Gagal menyimpan");
+      }
+    } else {
+      await refreshData();
+    }
+    setUsernameSaving(false);
   };
 
   const handleGenerateCode = async () => {
@@ -140,6 +169,37 @@ export default function SettingsPage() {
             <p className="text-[14px] text-on-surface-variant mt-0.5">{user?.email || "Tidak ada email"}</p>
           </div>
         </div>
+
+        {/* Username Field */}
+        <div className="flex flex-col gap-2 mb-6 border-t-2 border-primary/20 pt-4">
+          <label className="text-[14px] font-bold uppercase tracking-[0.05em]" htmlFor="username">
+            Username
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="username"
+              className="flex-1 bg-surface-container-low p-3 text-[16px] neo-input font-bold"
+              placeholder="contoh: budi123"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              maxLength={30}
+            />
+            <button
+              onClick={handleSaveUsername}
+              disabled={usernameSaving || !username.trim()}
+              className="px-4 py-2 border-2 border-primary bg-secondary-container font-bold text-[13px] uppercase tracking-[0.04em] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50"
+            >
+              {usernameSaving ? "…" : "Simpan"}
+            </button>
+          </div>
+          {usernameError && (
+            <div className="text-[12px] text-error font-bold">{usernameError}</div>
+          )}
+          <div className="text-[11px] text-on-surface-variant">
+            Username digunakan agar teman bisa menemukan akunmu melalui pencarian
+          </div>
+        </div>
+
         <button
           onClick={handleLogout}
           className="px-6 py-3 bg-surface-container-highest text-on-surface neo-border text-[14px] uppercase font-bold tracking-[0.05em] active-press neo-shadow-sm hover:bg-error hover:text-on-error transition-colors"
