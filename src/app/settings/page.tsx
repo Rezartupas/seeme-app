@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTaskContext } from "@/lib/task-context";
@@ -13,17 +13,6 @@ export default function SettingsPage() {
   const [linkCode, setLinkCode] = useState("");
   const [generating, setGenerating] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState("");
-  const [savingName, setSavingName] = useState(false);
-  const [username, setUsername] = useState(profile?.username ?? "");
-  const [usernameSaving, setUsernameSaving] = useState(false);
-  const [usernameError, setUsernameError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (profile?.username) {
-      setUsername(profile.username);
-    }
-  }, [profile?.username]);
 
   const displayName =
     profile?.name ||
@@ -32,9 +21,25 @@ export default function SettingsPage() {
     user?.email?.split("@")[0] ||
     "Pengguna";
 
-  useEffect(() => {
+  const [nameInput, setNameInput] = useState(displayName);
+  const [savingName, setSavingName] = useState(false);
+  const [username, setUsername] = useState(profile?.username ?? "");
+  const [usernameSaving, setUsernameSaving] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+
+  const [prevProfileUsername, setPrevProfileUsername] = useState(profile?.username);
+  if (profile?.username !== prevProfileUsername) {
+    setPrevProfileUsername(profile?.username);
+    if (profile?.username) {
+      setUsername(profile.username);
+    }
+  }
+
+  const [prevDisplayName, setPrevDisplayName] = useState(displayName);
+  if (displayName !== prevDisplayName) {
+    setPrevDisplayName(displayName);
     setNameInput(displayName);
-  }, [displayName]);
+  }
 
   const handleSaveName = async (e: React.FormEvent) => {
     e.preventDefault();

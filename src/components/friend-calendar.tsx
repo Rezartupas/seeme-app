@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSocialContext } from "@/lib/social-context";
 import { Activity } from "@/lib/types";
 import { ActivityModal } from "./activity-modal";
@@ -46,14 +46,20 @@ export function FriendCalendar({ friendId, currentUserId }: FriendCalendarProps)
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selected, setSelected] = useState<Activity | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    const data = await getFriendActivities(friendId);
-    setActivities(data);
-    setLoading(false);
+  useEffect(() => {
+    let mounted = true;
+    void (async () => {
+      setLoading(true);
+      const data = await getFriendActivities(friendId);
+      if (mounted) {
+        setActivities(data);
+        setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
   }, [friendId, getFriendActivities]);
-
-  useEffect(() => { load(); }, [load]);
 
   // Map activities by YYYY-MM-DD
   const byDate = useMemo(() => {

@@ -54,21 +54,30 @@ export default function DashboardPage() {
     "Pengguna";
 
   useEffect(() => {
-    // Detect browser timezone label (e.g. "WIB", "WITA", "SGT", "JST")
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const short = new Intl.DateTimeFormat("id-ID", {
-      timeZoneName: "short",
-      timeZone: tz,
-    })
-      .formatToParts(new Date())
-      .find((p) => p.type === "timeZoneName");
-    setTzLabel(short?.value || tz);
+    let mounted = true;
+    void (async () => {
+      // Detect browser timezone label (e.g. "WIB", "WITA", "SGT", "JST")
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const short = new Intl.DateTimeFormat("id-ID", {
+        timeZoneName: "short",
+        timeZone: tz,
+      })
+        .formatToParts(new Date())
+        .find((p) => p.type === "timeZoneName");
 
-    setCurrentTime(new Date());
+      if (mounted) {
+        setTzLabel(short?.value || tz);
+        setCurrentTime(new Date());
+      }
+    })();
+
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-    return () => clearInterval(timer);
+    return () => {
+      mounted = false;
+      clearInterval(timer);
+    };
   }, []);
 
   const overdueAll = getOverdueTasks();

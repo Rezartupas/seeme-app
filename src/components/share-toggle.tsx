@@ -7,7 +7,13 @@ interface ShareToggleProps {
 
 export function ShareToggle({ checked, onChange }: ShareToggleProps) {
   return (
-    <label className="flex items-center gap-3 cursor-pointer select-none group">
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="flex items-center gap-3 cursor-pointer select-none group text-left"
+    >
       <div
         className={`w-10 h-6 border-2 border-primary flex items-center transition-colors ${
           checked ? "bg-secondary-container" : "bg-surface-container-low"
@@ -23,6 +29,6 @@ export function ShareToggle({ checked, onChange }: ShareToggleProps) {
         <span className="material-symbols-outlined text-[18px]">group</span>
         Bagikan ke teman
       </span>
-    </label>
+    </button>
   );
 }

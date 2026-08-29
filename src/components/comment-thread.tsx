@@ -21,7 +21,18 @@ export function CommentThread({ activityId, ownerId, currentUserId }: CommentThr
     setComments(data);
   }, [activityId, getActivityComments]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    let mounted = true;
+    void (async () => {
+      const data = await getActivityComments(activityId);
+      if (mounted) {
+        setComments(data);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [activityId, getActivityComments]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

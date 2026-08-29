@@ -21,7 +21,18 @@ export function ReactionBar({ activityId, ownerId, currentUserId }: ReactionBarP
     setReactions(data);
   }, [activityId, getActivityReactions]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    let mounted = true;
+    void (async () => {
+      const data = await getActivityReactions(activityId);
+      if (mounted) {
+        setReactions(data);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [activityId, getActivityReactions]);
 
   const handleToggle = async (emoji: string) => {
     await toggleReaction(activityId, emoji, ownerId);

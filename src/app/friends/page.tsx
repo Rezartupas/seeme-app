@@ -23,7 +23,12 @@ export default function FriendsPage() {
 
   // Debounced search
   useEffect(() => {
-    if (!query.trim()) { setSearchResults([]); return; }
+    if (!query.trim()) {
+      const timer = setTimeout(() => {
+        setSearchResults([]);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
     const timer = setTimeout(async () => {
       setSearching(true);
       const results = await searchUsers(query);
