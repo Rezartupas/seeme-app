@@ -217,11 +217,15 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         }
 
         if (t.isShared) {
-          const startIso = t.date && t.startTime
-            ? new Date(`${t.date}T${t.startTime}`).toISOString()
+          const startIso = t.date
+            ? t.startTime
+              ? new Date(`${t.date}T${t.startTime}`).toISOString()
+              : new Date(`${t.date}T00:00:00`).toISOString()
             : null;
-          const endIso = t.date && t.endTime
-            ? new Date(`${t.date}T${t.endTime}`).toISOString()
+          const endIso = t.date
+            ? t.endTime
+              ? new Date(`${t.date}T${t.endTime}`).toISOString()
+              : new Date(`${t.date}T23:59:59`).toISOString()
             : null;
           await supabase.from("activities").upsert({
             user_id: user.id,

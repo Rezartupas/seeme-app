@@ -65,7 +65,7 @@ export function FriendCalendar({ friendId, currentUserId }: FriendCalendarProps)
   const byDate = useMemo(() => {
     const map = new Map<string, Activity[]>();
     for (const a of activities) {
-      const key = a.startTime ? formatYMD(new Date(a.startTime)) : "";
+      const key = a.startTime ? formatYMD(new Date(a.startTime)) : (a.createdAt ? formatYMD(new Date(a.createdAt)) : "");
       if (!key) continue;
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(a);

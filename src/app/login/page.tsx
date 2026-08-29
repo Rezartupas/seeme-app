@@ -24,8 +24,7 @@ export default function LoginPage() {
         password,
       });
       if (error) throw error;
-      router.push("/");
-      router.refresh();
+      window.location.href = "/";
     } catch (err: unknown) {
       if (err instanceof Error) {
         setErrorMsg(err.message);
