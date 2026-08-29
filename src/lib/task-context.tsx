@@ -122,6 +122,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         end_time: string | null;
         is_important: boolean;
         is_urgent: boolean;
+        is_shared: boolean;
         status: string;
         reminder_at: string | null;
         reminder_sent: boolean;
@@ -139,6 +140,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         endTime: t.end_time || undefined,
         isImportant: Boolean(t.is_important),
         isUrgent: Boolean(t.is_urgent),
+        isShared: Boolean(t.is_shared),
         status: t.status as "pending" | "completed",
         reminderAt: t.reminder_at || undefined,
         reminderSent: Boolean(t.reminder_sent),
@@ -196,6 +198,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
             end_time: t.endTime || null,
             is_important: t.isImportant,
             is_urgent: t.isUrgent,
+            is_shared: t.isShared ?? false,
             status: t.status,
             reminder_at: t.reminderAt || null,
           })

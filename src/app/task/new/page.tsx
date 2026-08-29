@@ -49,6 +49,7 @@ export default function NewTaskPage() {
         reminderAt: reminderAt ? new Date(reminderAt).toISOString() : undefined,
         isUrgent,
         isImportant,
+        isShared: false,
         status: "pending",
         categoryIds: selectedCats,
       });
