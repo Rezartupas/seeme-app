@@ -18,7 +18,7 @@ select cron.schedule(
   '* * * * *',
   $$
   select net.http_post(
-    url := 'https://seeme-app.vercel.app/api/cron/reminders',
+    url := 'https://reminder.seeme.id/api/cron/reminders',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'Authorization', 'Bearer seeme_cron_sec_8f93e1b04a9d7248c5e6211fa'
